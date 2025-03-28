@@ -2,19 +2,31 @@
 #include <iostream>
 #pragma comment(lib, "Ws2_32.lib")
 #include <cstdlib>
+#include <fstream>
+#include <sstream>
+
 using namespace std;
 
 // Define our DataPacket here
 struct DataPacket
 {
 	// Packet Number?
+	int PktNum;
+
 	// Timestamp
+	//char DateTime[18];
+	string DateTIme;		// Will a string work or will it need to be structured
+
 	// Remaining Fuel
+	double Fuel;
 };
 
 // Main function
 int main()
 {
+	//This is for random file reading
+	string Filepaths[]{"katl-kefd-B737-700", "Telem_2023_3_12 14_56_40", "Telem_2023_3_12 16_26_4", "Telem_czba-cykf-pa28-w2_2023_3_1 12_31_27"};
+
 	// Socket Components
 	WSADATA wsaData;
 	SOCKET ClientSocket;
@@ -38,10 +50,58 @@ int main()
 	// Add our Client logic and comunication here
 
 	// File open
+	// Seed for rand
+	srand (time(NULL));
 
-	// Send data line by line using packet construct
+	// Random file to open
+	int fpnum = rand() % 4;
+	string fp = Filepaths[fpnum];
+
+	// Open the file
+	ifstream fin;
+	fin.open(fp);
+	if (fin.is_open())
+	{
+		// Send data line by line using packet construct
+		string line;
+		DataPacket SPkt;
+
+		// While not at the end of file
+		while (!fin.eof())
+		{
+			// Get the line
+			getline(fin, line);
+
+			// Convert lien to stringstream
+			istringstream sline(line);
+
+			// Get the first partition of the line and store it in the datetime part of the packet
+			getline(sline, SPkt.DateTIme, ',');
+
+			// Create a temp string
+			string tempFuel;
+
+			// Get the secodn partition of the lien and store it in the temp variable
+			getline(sline, tempFuel);
+
+			// Convert the temp variable from string to double and put into the pkt
+			SPkt.Fuel = stod(tempFuel);
+
+			// Assign PKT Num
+			// Send PKT
+
+			// Recv Responce
+
+			//Loop again
+		}
+	}
+	else
+	{
+		cout << "Cannont Open File: " << fp << endl;
+	}
 
 	// File close
+	fin.close();
 
 	closesocket(ClientSocket);
 	WSACleanup();
