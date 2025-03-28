@@ -7,9 +7,20 @@ using namespace std;
 struct DataPacket
 {
 	// Packet Number?
+	int PktNum;
+
 	// Timestamp
+	char DateTime[18];
+	//string DateTIme;		// Will a string work or will it need to be structured
+
 	// Remaining Fuel
+	double Fuel;
 };
+
+void ThreadLogic()
+{
+
+}
 
 // Main function
 int main()

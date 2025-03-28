@@ -14,8 +14,8 @@ struct DataPacket
 	int PktNum;
 
 	// Timestamp
-	//char DateTime[18];
-	string DateTIme;		// Will a string work or will it need to be structured
+	char DateTime[18];
+	//string DateTIme;		// Will a string work or will it need to be structured
 
 	// Remaining Fuel
 	double Fuel;
@@ -65,6 +65,7 @@ int main()
 		// Send data line by line using packet construct
 		string line;
 		DataPacket SPkt;
+		int PktId = 0;
 
 		// While not at the end of file
 		while (!fin.eof())
@@ -75,8 +76,14 @@ int main()
 			// Convert lien to stringstream
 			istringstream sline(line);
 
+			// Create a temp string
+			string tempDateTime;
+
 			// Get the first partition of the line and store it in the datetime part of the packet
-			getline(sline, SPkt.DateTIme, ',');
+			getline(sline, tempDateTime, ',');
+
+			// Copy the tempDateTime into the pkt
+			memcpy(SPkt.DateTime, &tempDateTime, sizeof(SPkt.DateTime));
 
 			// Create a temp string
 			string tempFuel;
@@ -88,9 +95,15 @@ int main()
 			SPkt.Fuel = stod(tempFuel);
 
 			// Assign PKT Num
+			SPkt.PktNum = PktId;
+			PktId++;
+
 			// Send PKT
+			send(ClientSocket, (char*) &SPkt, sizeof(SPkt), 0);
 
 			// Recv Responce
+			char resp[2];
+			recv(ClientSocket, (char*)resp, sizeof(resp), 0);
 
 			//Loop again
 		}
